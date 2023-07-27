@@ -88,11 +88,11 @@ This function controls the registration process for a new user. When called, the
 
 ### `login_user()`
 
-This function controls the login process in the system or application. When called, the function retrieves the entered username and password from the corresponding entry widgets (login_username_entry and login_password_entry). It then hashes the entered password using the SHA-256 algorithm.
+This function controls the login process. When called, the function retrieves the entered username and password from the corresponding entry widgets (login_username_entry and login_password_entry). It then hashes the entered password using the SHA-256 algorithm.
 
 The function proceeds to connect to the SQLite database file (DATABASE_FILE) checks if the entered username and hashed password match any existing user in the "users" table. If a match is found (user is not None), it logs in. The function deletes the contents of the username and password entry widgets, updates an error label to indicate a successful login, and then destroys the login window.
 
-After a successful login, the function sets up a socket connection to the server at IP address '127.0.0.1' and port 59000. The global client variable is used to store the socket for later communication with the server. The user's username is sent to the server using the socket's send() method in UTF-8 encoded format.
+After a successful login, the function sets up a socket connection to the server at IP address '127.0.0.1' and port 59000. The global client variable is used to store the socket. The user's username is sent to the server using the socket's send() method in UTF-8 encoded format.
 
 Finally, the function calls the open_chat_window(username) function, which opens the chat window. The user's username is passed as an argument to the open_chat_window() function. If the login is unsuccessful, an error message indicating an invalid username or password is displayed in the error label.
 
