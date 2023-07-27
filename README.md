@@ -21,7 +21,7 @@ This function connects to the SQLite database and if it doesn't exist already th
 
 ### `broadcast(message, sender="Server")`
 
-This function sends a message to all connected clients and stores it in the database with the a timestamp and the sender's username.
+This function is responsible for sending messages to all connected clients in the chat room. It appends the current timestamp to the provided message and the sender (set to "Server"). It stores this message in the database table "messages" by entering a section protected by a lock (db_lock). After storing the message, it broadcasts it to all connected clients by iterating through the list of clients and sending the message using the send() method of their respective sockets. In case of any error during the message sending process, it prints an error message.
 
 #### Parameters
 
@@ -31,7 +31,7 @@ This function sends a message to all connected clients and stores it in the data
 
 ### `handle_client(client)`
 
-This function is responsible for handling communication with clients. It listens for messages from the client and broadcasts them to other clients. It also handles client connections, disconnections, and server shutdown.
+This function is managing individual client connections. When a client connects to the server, this function is called, taking the connected socket (client) as an argument. The function starts by receiving the client's alias, adding the client and alias to their lists, and sending a welcome message to the client and broadcasting the client's connection to all other clients. It then enters a continuous loop to listen for incoming messages from other clients. When a message is received, it is decoded into a string and broadcasted to all clients. If any exception occurs or if the client exits the chat room, it removes the client's alias from the list of connected clients, and broadcasts a disconnection message to other clients.
 
 #### Parameters
 
@@ -40,8 +40,7 @@ This function is responsible for handling communication with clients. It listens
 
 ### `receive()`
 
-This function is the main loop that listens for incoming client connections. It accepts incoming connections, creates a new thread to handle each client, and keeps the server running until the server_running flag is set to False.
-
+The receive() function sets up a loop to continuously accept client connections. When a client connection is established, a new thread is created. The function runs until server_running is set to False, and any errors during the connection handling process are caught and printed.
 
 ## Execution
 
@@ -69,7 +68,7 @@ This function displays a window for user login and registration. Users can enter
 
 ### `open_chat_window(alias)`
 
-This function creates a new window once the user is successfully logged in. It allows users to send and receive messages through a socket connection to the server.
+This function creates a graphical user interface (GUI) for the chat client. When called, it initializes a new window and creates a text widget for displaying incoming messages (message_text) and an entry widget for typing messages (input_entry). It defines two inner functions, send_message() and receive_messages().
 
 #### Parameters
 
@@ -77,22 +76,25 @@ This function creates a new window once the user is successfully logged in. It a
 
 ### `send_message()`
 
-This function is called when the user clicks the "Send" button in the chat window. It sends the user's message to the server.
-
+This function is responsible for sending messages entered by the user in the input_entry widget to the server. It encodes the message along with the client's alias and sends it using the client.send() method. After sending the message, it clears the input_entry widget.
 
 ### `receive_messages()`
 
-This function continuously listens for incoming messages from the server. When a message is received, it is displayed in the chat window.
-
+This function runs in a continuous loop to receive messages from the server and display them in the message_text widget. It decodes the received message, inserts it into the message_text widget at the end, and appends a new line.
 
 ### `register_user()`
 
-This function is called when the user clicks the "Register" button in the login window. It registers a new user by storing their username and hashed password in the SQLite database.
-
+This function controls the registration process for a new user. When called, the function retrieves the entered username and password from the corresponding entry widgets (register_username_entry and register_password_entry). It then hashes the password using the SHA-256 algorithm. The function then connects to a SQLite database file (DATABASE_FILE). It checks if the entered username already exists in the database, and if the username is not found (data is None), it inserts the new user's username and hashed password into the "users" table. If the username already exists, it displays an error message indicating that the username is already taken. Afterwards, the function clears the username and password entry widgets for the next registration attempt.
 
 ### `login_user()`
 
-This function is called when the user clicks the "Login" button. It verifies the username and password.
+This function controls the login process in the system or application. When called, the function retrieves the entered username and password from the corresponding entry widgets (login_username_entry and login_password_entry). It then hashes the entered password using the SHA-256 algorithm.
+
+The function proceeds to connect to the SQLite database file (DATABASE_FILE) checks if the entered username and hashed password match any existing user in the "users" table. If a match is found (user is not None), it logs in. The function deletes the contents of the username and password entry widgets, updates an error label to indicate a successful login, and then destroys the login window.
+
+After a successful login, the function sets up a socket connection to the server at IP address '127.0.0.1' and port 59000. The global client variable is used to store the socket for later communication with the server. The user's username is sent to the server using the socket's send() method in UTF-8 encoded format.
+
+Finally, the function calls the open_chat_window(username) function, which opens the chat window. The user's username is passed as an argument to the open_chat_window() function. If the login is unsuccessful, an error message indicating an invalid username or password is displayed in the error label.
 
 #### Return Value
 
