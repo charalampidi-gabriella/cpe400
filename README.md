@@ -105,3 +105,5 @@ The `authenticate()` function sets up the login and registration window using Tk
 
 If the login is successful, the `open_chat_window()` function creates a new window for the chat interface. The user can send and receive messages through a socket connection with the server.
 
+# client.py
+This file is the client side of the program that uses sockets over a TCP/IP network.It starts by importing the necessary modules , and then it sets up the socket connection. The host variable represents the IP address of the server to connect to, and the port variable specifies the port number to use. The client creates a TCP socket using socket.socket() and then connects to the server using client.connect().
